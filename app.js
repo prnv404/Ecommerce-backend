@@ -14,14 +14,18 @@ const errorHandlerMiddleware = require('./middleware/error-handler')
 
 // ROUTES
 
-const authRoute = require('./routes/auth-routes')
+const authRouter = require('./routes/auth-routes')
 
 // MIDDLEWARES
 
 app.use(express.json())
 app.use(morgan('dev'))
 
-app.use('/api/v1/auth', authRoute)
+app.get('/', (req, res) => {
+  res.send('Ecommerce-api')
+})
+
+app.use('/api/v1/auth', authRouter)
 
 app.use(notFoundMiddleware)
 app.use(errorHandlerMiddleware)
