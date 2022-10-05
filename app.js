@@ -3,6 +3,7 @@ require('express-async-errors')
 
 const express = require('express')
 const morgan = require('morgan')
+const cookieParser = require('cookie-parser')
 const app = express()
 
 // DB
@@ -19,9 +20,14 @@ const authRouter = require('./routes/auth-routes')
 // MIDDLEWARES
 
 app.use(express.json())
+app.use(cookieParser())
 app.use(morgan('dev'))
 
 app.get('/', (req, res) => {
+  res.send('Ecommerce-api')
+})
+app.get('/api/v1', (req, res) => {
+  console.log(req.cookies)
   res.send('Ecommerce-api')
 })
 
