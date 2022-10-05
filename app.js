@@ -16,34 +16,34 @@ const errorHandlerMiddleware = require('./middleware/error-handler')
 // ROUTES
 
 const authRouter = require('./routes/auth-routes')
-
+const userRouter = require('./routes/user-route')
 // MIDDLEWARES
 
 app.use(express.json())
-app.use(cookieParser())
+app.use(cookieParser(process.env.JWT_SECRET))
 app.use(morgan('dev'))
 
 app.get('/', (req, res) => {
-  res.send('Ecommerce-api')
+	res.send('Ecommerce-api')
 })
 app.get('/api/v1', (req, res) => {
-  console.log(req.cookies)
-  res.send('Ecommerce-api')
+	console.log(req.signedCookies)
+	res.send('Ecommerce-api')
 })
 
 app.use('/api/v1/auth', authRouter)
-
+app.use('/api/v1/users', userRouter)
 app.use(notFoundMiddleware)
 app.use(errorHandlerMiddleware)
 
 const port = process.env.PORT || 3000
 const start = async () => {
-  try {
-    await connectDB(process.env.MONGO_URI)
-    app.listen(port, () => {})
-    console.log(`server is spinning on port ${port}`)
-  } catch (error) {
-    console.log(error)
-  }
+	try {
+		await connectDB(process.env.MONGO_URI)
+		app.listen(port, () => {})
+		console.log(`server is spinning on port ${port}`)
+	} catch (error) {
+		console.log(error)
+	}
 }
 start()

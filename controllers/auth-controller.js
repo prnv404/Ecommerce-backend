@@ -25,7 +25,7 @@ const register = async (req, res) => {
 		user: { name: user.name, userId: user._id, role: user.role },
 	}
 	attachCookiesToResponse({ res, user: tokenUser })
-	res.status(StatusCodes.CREATED).json({ user })
+	res.status(StatusCodes.CREATED).json({ tokenUser })
 }
 
 /**
@@ -35,11 +35,35 @@ const register = async (req, res) => {
  * @param res - The response object.
  */
 const login = async (req, res) => {
-	res.send('Hello from Login')
+	const { email, password } = req.body
+	if (!email || !password) {
+		throw new CustomError.BadRequestError(
+			'please provide email and password'
+		)
+	}
+	const user = await User.findOne({ email })
+	if (!user) {
+		throw new CustomError.UnauthenticatedError('Invalid Crendtials')
+	}
+
+	const isMatch = await user.comparePassword(password)
+	if (!isMatch) {
+		throw new CustomError.UnauthenticatedError('Incorrect Password')
+	}
+	const tokenUser = {
+		user: { name: user.name, userId: user._id, role: user.role },
+	}
+
+	attachCookiesToResponse({ res, user: tokenUser })
+	res.status(StatusCodes.CREATED).json({ tokenUser })
 }
 
 const logout = async (req, res) => {
-	res.send('Hello from Logout')
+	res.cookie('token', 'logout', {
+		httpOnly: true,
+		expires: new Date(Date.now()),
+	})
+	res.status(StatusCodes.OK).json({ msg: 'logout succesfully' })
 }
 
 module.exports = {
