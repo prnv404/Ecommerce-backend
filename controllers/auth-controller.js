@@ -4,10 +4,10 @@ const { StatusCodes } = require('http-status-codes')
 const { createTokenUser, attachCookiesToResponse } = require('../utils')
 
 
+
 /**
- * It creates a new user and returns a token via cookies
- * @param req - The request object. This contains information about the HTTP request that raised the
- * event.
+ * It creates a new user and returns a token
+ * @param req - The request object.
  * @param res - The response object.
  */
 
@@ -29,10 +29,10 @@ const register = async (req, res) => {
 }
 
 
+
 /**
- * It's a function that takes in a request and a response object, and sends back a string of text
- * @param req - The request object represents the HTTP request and has properties for the request query
- * string, parameters, body, HTTP headers, and so on.
+ * It takes in a request and a response, and returns a tokenUser object
+ * @param req - The request object.
  * @param res - The response object.
  */
 
@@ -60,8 +60,7 @@ const login = async (req, res) => {
 
 /**
  * It sets the cookie to 'logout' and expires it immediately
- * @param req - The request object. This contains information about the HTTP request that raised the
- * event.
+ * @param req - The request object.
  * @param res - The response object.
  */
 

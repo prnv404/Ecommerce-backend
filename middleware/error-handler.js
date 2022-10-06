@@ -1,4 +1,15 @@
 const { StatusCodes } = require('http-status-codes');
+
+
+/**
+ * It takes an error object, checks if it's a mongoose validation error, a duplicate key error, or a
+ * cast error, and returns a custom error message with a status code
+ * @param err - The error object that was thrown.
+ * @param req - The request object.
+ * @param res - The response object.
+ * @param next - This is a function that you call when you want to move on to the next middleware.
+ * @returns a function that takes in 4 parameters.
+ */
 const errorHandlerMiddleware = (err, req, res, next) => {
   let customError = {
     // set default
