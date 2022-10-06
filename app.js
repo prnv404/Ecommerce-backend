@@ -41,7 +41,7 @@ const start = async () => {
 	try {
 		await connectDB(process.env.MONGO_URI)
 		app.listen(port, () => {})
-		console.log(`server is spinning on port ${port}`)
+		console.log(`server is 🏃 on port ${port}`)
 	} catch (error) {
 		console.log(error)
 	}
