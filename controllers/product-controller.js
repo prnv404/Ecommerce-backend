@@ -1,7 +1,7 @@
 const { StatusCodes } = require('http-status-codes')
 const Product = require('../models/product-model')
 const CustomError = require('../errors')
-const { findOne } = require('../models/product-model')
+const path = require('path')
 
 const createProduct = async (req, res) => {
 	req.body.user = req.user.userId
@@ -43,9 +43,25 @@ const deleteProduct = async (req, res) => {
 }
 
 const uploadImage = async (req, res) => {
-	res.send('uploadImage')
-}
+	if (!req.files) {
+		throw new CustomError.BadRequestError('Please provide image')
+	}
 
+	const productImage = req.files.image
+	if (!productImage.mimetype.startsWith('image')) {
+		throw new CustomError.BadRequestError('Please provide image')
+	}
+	const maxSize = 1024 * 1024
+	if (productImage.size > maxSize) {
+		throw new CustomError.BadRequestError('Please provide image less than 1 mb')
+	}
+	const imagePath = path.join(
+		__dirname,
+		'../public/uploads/' + `${productImage.name}`
+	)
+	await productImage.mv(imagePath)
+	res.status(StatusCodes.OK).json({ image: `/uploads/${productImage.name}` })
+}
 module.exports = {
 	createProduct,
 	getAllProducts,

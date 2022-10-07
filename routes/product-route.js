@@ -24,7 +24,7 @@ router
 	.get(getSingleProduct)
 	.delete(authenticateUser, authorizePermission('admin'), deleteProduct)
 router
-	.route('uploadImage')
+	.route('/uploadImage')
 	.post(authenticateUser, authorizePermission('admin'), uploadImage)
 
 module.exports = router
