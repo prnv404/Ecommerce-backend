@@ -1,4 +1,4 @@
-const { boolean, number, required } = require('joi')
+const { func } = require('joi')
 const mongoose = require('mongoose')
 
 const ProductSchema = mongoose.Schema(
@@ -32,7 +32,7 @@ const ProductSchema = mongoose.Schema(
 		company: {
 			type: String,
 			required: [true, 'Please provide company'],
-			enum: ['marcos', 'ikea','liddy'],
+			enum: ['marcos', 'ikea', 'liddy'],
 		},
 		color: {
 			type: [String],
@@ -70,6 +70,10 @@ ProductSchema.virtual('reviews', {
 	localField: '_id',
 	foreignField: 'product',
 	justOne: false,
+})
+
+ProductSchema.pre('remove', async function (next) {
+	await this.model('Review').deleteMany({ product: this._id })
 })
 
 module.exports = mongoose.model('Product', ProductSchema)
