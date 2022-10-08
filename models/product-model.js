@@ -32,7 +32,7 @@ const ProductSchema = mongoose.Schema(
 		company: {
 			type: String,
 			required: [true, 'Please provide company'],
-			enum: ['marcos', 'ikea'],
+			enum: ['marcos', 'ikea','liddy'],
 		},
 		color: {
 			type: [String],
@@ -62,7 +62,14 @@ const ProductSchema = mongoose.Schema(
 			required: true,
 		},
 	},
-	{ timestamps: true }
+	{ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 )
+
+ProductSchema.virtual('reviews', {
+	ref: 'Review',
+	localField: '_id',
+	foreignField: 'product',
+	justOne: false,
+})
 
 module.exports = mongoose.model('Product', ProductSchema)
