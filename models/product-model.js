@@ -1,4 +1,3 @@
-const { func } = require('joi')
 const mongoose = require('mongoose')
 
 const ProductSchema = mongoose.Schema(
@@ -53,6 +52,10 @@ const ProductSchema = mongoose.Schema(
 			default: 15,
 		},
 		averageRating: {
+			type: Number,
+			default: 0,
+		},
+		numOfReviews: {
 			type: Number,
 			default: 0,
 		},
