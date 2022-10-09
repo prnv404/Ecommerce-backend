@@ -92,7 +92,17 @@ const getCurrentUserOrders = async (req, res) => {
 }
 
 const updateOrder = async (req, res) => {
-	res.send('updateOrder')
+	const { id: orderId } = req.params
+	const { paymentIntent } = req.body
+	const order = await Order.findOne({ _id: orderId })
+	if (!order) {
+		throw new CustomError.NotFoundError('No order found')
+	}
+	checkPermission(req.user.userId, order.user)
+	order.paymentIntent = paymentIntent
+	order.status = 'paid'
+	await order.save()
+	res.status(StatusCodes.OK).json(order)
 }
 
 module.exports = {
