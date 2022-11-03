@@ -1,9 +1,7 @@
+const { StatusCodes } = require('http-status-codes')
 const User = require('../models/user-model')
 const CustomError = require('../errors')
-const { StatusCodes } = require('http-status-codes')
 const { createTokenUser, attachCookiesToResponse } = require('../utils')
-
-
 
 /**
  * It creates a new user and returns a token
@@ -28,8 +26,6 @@ const register = async (req, res) => {
 	res.status(StatusCodes.CREATED).json({ tokenUser })
 }
 
-
-
 /**
  * It takes in a request and a response, and returns a tokenUser object
  * @param req - The request object.
@@ -39,9 +35,7 @@ const register = async (req, res) => {
 const login = async (req, res) => {
 	const { email, password } = req.body
 	if (!email || !password) {
-		throw new CustomError.BadRequestError(
-			'please provide email and password'
-		)
+		throw new CustomError.BadRequestError('please provide email and password')
 	}
 	const user = await User.findOne({ email })
 	if (!user) {
@@ -56,8 +50,6 @@ const login = async (req, res) => {
 	attachCookiesToResponse({ res, user: tokenUser })
 	res.status(StatusCodes.CREATED).json({ tokenUser })
 }
-
-
 /**
  * It sets the cookie to 'logout' and expires it immediately
  * @param req - The request object.

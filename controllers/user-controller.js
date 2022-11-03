@@ -1,13 +1,11 @@
-const User = require('../models/user-model')
 const { StatusCodes } = require('http-status-codes')
+const User = require('../models/user-model')
 const CustomError = require('../errors')
 const {
 	createTokenUser,
 	attachCookiesToResponse,
 	checkPermission,
 } = require('../utils')
-
-
 /**
  * It gets all the users from the database and sends them back to the client
  * @param req - The request object. This contains information about the HTTP request that raised the
@@ -25,12 +23,16 @@ const getAllUser = async (req, res) => {
  * @param req - The request object.
  * @param res - The response object.
  */
+
 const getSingleUser = async (req, res) => {
 	const user = await User.findOne({ _id: req.params.id }).select('-password')
+
 	if (!user) {
 		throw new CustomError.NotFoundError('NO user found')
 	}
+
 	checkPermission(req.user.userId, user._id)
+
 	res.status(StatusCodes.OK).json({ user })
 }
 /**

@@ -1,4 +1,5 @@
 const express = require('express')
+
 const router = express.Router()
 
 const {
@@ -7,7 +8,7 @@ const {
 	showCurrentUser,
 	updateUser,
 	updateUserPassword,
-} = require('../controllers/user-controller')
+} = require('../controllers')
 
 const {
 	authenticateUser,

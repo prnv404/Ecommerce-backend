@@ -1,5 +1,7 @@
-const Order = require('../models/order-model')
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 const { StatusCodes } = require('http-status-codes')
+const Order = require('../models/order-model')
 const Product = require('../models/product-model')
 const CustomError = require('../errors')
 const { checkPermission } = require('../utils')

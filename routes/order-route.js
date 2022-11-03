@@ -1,4 +1,5 @@
 const express = require('express')
+
 const router = express.Router()
 
 const {
@@ -7,7 +8,7 @@ const {
 	getSingleOrder,
 	createOrder,
 	updateOrder,
-} = require('../controllers/order-controller')
+} = require('../controllers')
 const {
 	authenticateUser,
 	authorizePermission,

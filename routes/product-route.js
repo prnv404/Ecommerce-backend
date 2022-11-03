@@ -1,4 +1,5 @@
 const express = require('express')
+
 const router = express.Router()
 const {
 	authenticateUser,
@@ -12,9 +13,9 @@ const {
 	uploadImage,
 	deleteProduct,
 	createProduct,
-} = require('../controllers/product-controller')
+} = require('../controllers')
 
-const { getSingleProductReview } = require('../controllers/review-controller')
+const { getSingleProductReview } = require('../controllers')
 
 router
 	.route('/')
