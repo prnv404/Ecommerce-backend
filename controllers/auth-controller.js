@@ -21,8 +21,11 @@ const register = async (req, res) => {
 	const role = isFirstAccount ? 'admin' : 'user'
 
 	const user = await User.create({ name, email, password, role })
+
 	const tokenUser = createTokenUser(user)
+
 	attachCookiesToResponse({ res, user: tokenUser })
+
 	res.status(StatusCodes.CREATED).json({ tokenUser })
 }
 
@@ -34,20 +37,27 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
 	const { email, password } = req.body
+
 	if (!email || !password) {
 		throw new CustomError.BadRequestError('please provide email and password')
 	}
+
 	const user = await User.findOne({ email })
+
 	if (!user) {
 		throw new CustomError.UnauthenticatedError('Invalid Crendtials')
 	}
 
 	const isMatch = await user.comparePassword(password)
+
 	if (!isMatch) {
 		throw new CustomError.UnauthenticatedError('Incorrect Password')
 	}
+
 	const tokenUser = createTokenUser(user)
+
 	attachCookiesToResponse({ res, user: tokenUser })
+
 	res.status(StatusCodes.CREATED).json({ tokenUser })
 }
 /**
@@ -61,6 +71,7 @@ const logout = async (req, res) => {
 		httpOnly: true,
 		expires: new Date(Date.now()),
 	})
+
 	res.status(StatusCodes.OK).json({ msg: 'logout succesfully' })
 }
 

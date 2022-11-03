@@ -22,6 +22,7 @@ const createOrder = async (req, res) => {
 	if (!cartItems || cartItems.length < 1) {
 		throw new CustomError.BadRequestError('No cart items provided')
 	}
+
 	if (!tax || !shippingFee) {
 		throw new CustomError.BadRequestError('Please provide tax and shipping fee')
 	}
@@ -73,6 +74,7 @@ const createOrder = async (req, res) => {
 		.status(StatusCodes.CREATED)
 		.json({ order, clientSecret: order.clientSecret })
 }
+
 const getAllOrders = async (req, res) => {
 	const orders = await Order.find({})
 	res.status(StatusCodes.OK).json(orders)
@@ -82,9 +84,11 @@ const getSingleOrder = async (req, res) => {
 	const { id: singleOrder } = req.params
 
 	const order = await Order.findOne({ _id: singleOrder })
+	
 	if (!order.user === req.user.userId) {
 		throw new CustomError.unauthorized('You have no access')
 	}
+
 	checkPermission(req.user.userId, order.user)
 	res.status(StatusCodes.OK).json(order)
 }
