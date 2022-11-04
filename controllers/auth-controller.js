@@ -10,7 +10,7 @@ const { createTokenUser, attachCookiesToResponse } = require('../utils')
  */
 
 const register = async (req, res) => {
-	const { email, name, password } = req.body
+	const { email, name, password, phoneNumber } = req.body
 
 	const emailExist = await User.findOne({ email })
 	if (emailExist) {
