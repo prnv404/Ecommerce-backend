@@ -1,10 +1,11 @@
 const { StatusCodes } = require('http-status-codes')
+const crypto = require('crypto')
 const User = require('../models/user-model')
 const CustomError = require('../errors')
 const { createTokenUser, attachCookiesToResponse } = require('../utils')
 
 /**
- * It creates a new user and returns a token
+ * It creates a new user and returns a verification token
  * @param req - The request object.
  * @param res - The response object.
  */
@@ -22,7 +23,7 @@ const register = async (req, res) => {
 
 	const role = isFirstAccount ? 'admin' : 'user'
 
-	const verificationToken = 'verification token'
+	const verificationToken = crypto.randomBytes(40).toString('hex')
 
 	const user = await User.create({
 		name,
@@ -32,14 +33,15 @@ const register = async (req, res) => {
 		verificationToken,
 	})
 
-	res.status(StatusCodes.CREATED).josn({
+	res.status(StatusCodes.CREATED).json({
 		message: 'Please verify your email to verify account',
 		verificationToken,
 	})
 }
 
 /**
- * It takes in a request and a response, and returns a tokenUser object
+ * It takes in an email and password from the request body, checks if the user exists, compares the
+ * password, and if everything is correct, it creates a token and attaches it to the response
  * @param req - The request object.
  * @param res - The response object.
  */
@@ -73,6 +75,7 @@ const login = async (req, res) => {
 
 	res.status(StatusCodes.CREATED).json({ tokenUser })
 }
+
 /**
  * It sets the cookie to 'logout' and expires it immediately
  * @param req - The request object.
@@ -88,6 +91,12 @@ const logout = async (req, res) => {
 	res.status(StatusCodes.OK).json({ msg: 'logout succesfully' })
 }
 
+/**
+ * It verifies a user's email address
+ * @param req - The request object.
+ * @param res - The response object.
+ */
+
 const verifyEmail = async (req, res) => {
 	const { verificationToken, email } = req.body
 
@@ -95,19 +104,18 @@ const verifyEmail = async (req, res) => {
 		throw new CustomError.BadRequestError('Please provide all Values')
 	}
 
-	const user = await User.findOne(email)
+	const user = await User.findOne({ email })
 	if (!user) {
 		throw new CustomError.NotFoundError('NO user found')
 	}
-	const userVerificationToken = user.verificationToken
 
-	if (!userVerificationToken === verificationToken) {
+	if (user.verificationToken !== verificationToken) {
 		throw new CustomError.BadRequestError('Token dosent match')
 	}
 
 	user.isVerified = true
 
-	user.isVerified = Date.now()
+	user.verified = Date.now()
 
 	user.verificationToken = ''
 
@@ -117,8 +125,8 @@ const verifyEmail = async (req, res) => {
 }
 
 module.exports = {
+	verifyEmail,
 	register,
 	login,
 	logout,
-	verifyEmail,
 }
