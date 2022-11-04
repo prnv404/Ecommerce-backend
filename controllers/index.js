@@ -34,10 +34,9 @@ const {
 } = require('./user-controller')
 
 module.exports = {
-	verifyEmail,
-	getAllOrders,
 	getSingleOrder,
 	getCurrentUserOrders,
+	getAllOrders,
 	createOrder,
 	updateOrder,
 	createProduct,
@@ -57,4 +56,8 @@ module.exports = {
 	deleteReview,
 	createReview,
 	getSingleProductReview,
+	register,
+	login,
+	logout,
+	verifyEmail,
 }
