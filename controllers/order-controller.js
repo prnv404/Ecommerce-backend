@@ -86,7 +86,7 @@ const getSingleOrder = async (req, res) => {
 	const order = await Order.findOne({ _id: singleOrder })
 	
 	if (!order.user === req.user.userId) {
-		throw new CustomError.unauthorized('You have no access')
+		throw new CustomError.Unauthorized('You have no access')
 	}
 
 	checkPermission(req.user.userId, order.user)

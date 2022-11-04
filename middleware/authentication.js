@@ -8,7 +8,7 @@ const { isTokenValid } = require('../utils')
  * @param next - This is a function that you call when you want to move on to the next middleware.
  */
 const authenticateUser = async (req, res, next) => {
-	const token = req.signedCookies.token
+	const { token } = req.signedCookies
 	// console.log(req.signedCookies)
 	if (!token) {
 		throw new CustomError.UnauthenticatedError('Token Error')
