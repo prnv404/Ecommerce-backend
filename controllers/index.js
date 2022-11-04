@@ -1,4 +1,4 @@
-const { register, login, logout } = require('./auth-controller')
+const { register, login, logout, verifyEmail } = require('./auth-controller')
 const {
 	getAllOrders,
 	getSingleOrder,
@@ -34,6 +34,7 @@ const {
 } = require('./user-controller')
 
 module.exports = {
+	verifyEmail,
 	getAllOrders,
 	getSingleOrder,
 	getCurrentUserOrders,

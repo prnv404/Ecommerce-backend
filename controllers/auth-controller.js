@@ -10,23 +10,32 @@ const { createTokenUser, attachCookiesToResponse } = require('../utils')
  */
 
 const register = async (req, res) => {
-	const { email, name, password, phoneNumber } = req.body
+	const { email, name, password } = req.body
 
 	const emailExist = await User.findOne({ email })
+
 	if (emailExist) {
 		throw new CustomError.BadRequestError('Email already exist')
 	}
 
 	const isFirstAccount = (await User.countDocuments({})) === 0
+
 	const role = isFirstAccount ? 'admin' : 'user'
 
-	const user = await User.create({ name, email, password, role })
+	const verificationToken = 'verification token'
 
-	const tokenUser = createTokenUser(user)
+	const user = await User.create({
+		name,
+		email,
+		password,
+		role,
+		verificationToken,
+	})
 
-	attachCookiesToResponse({ res, user: tokenUser })
-
-	res.status(StatusCodes.CREATED).json({ tokenUser })
+	res.status(StatusCodes.CREATED).josn({
+		message: 'Please verify your email to verify account',
+		verificationToken,
+	})
 }
 
 /**
@@ -49,6 +58,10 @@ const login = async (req, res) => {
 	}
 
 	const isMatch = await user.comparePassword(password)
+
+	if (!user.isVerified === true) {
+		throw new CustomError.UnauthenticatedError('Please verify your account')
+	}
 
 	if (!isMatch) {
 		throw new CustomError.UnauthenticatedError('Incorrect Password')
@@ -75,8 +88,37 @@ const logout = async (req, res) => {
 	res.status(StatusCodes.OK).json({ msg: 'logout succesfully' })
 }
 
+const verifyEmail = async (req, res) => {
+	const { verificationToken, email } = req.body
+
+	if (!verificationToken || !email) {
+		throw new CustomError.BadRequestError('Please provide all Values')
+	}
+
+	const user = await User.findOne(email)
+	if (!user) {
+		throw new CustomError.NotFoundError('NO user found')
+	}
+	const userVerificationToken = user.verificationToken
+
+	if (!userVerificationToken === verificationToken) {
+		throw new CustomError.BadRequestError('Token dosent match')
+	}
+
+	user.isVerified = true
+
+	user.isVerified = Date.now()
+
+	user.verificationToken = ''
+
+	await user.save()
+
+	res.status(StatusCodes.OK).json({ msg: 'user verified' })
+}
+
 module.exports = {
 	register,
 	login,
 	logout,
+	verifyEmail,
 }

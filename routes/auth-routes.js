@@ -5,10 +5,11 @@ const {
 	authenticateUser,
 	authorizePermission,
 } = require('../middleware/authentication')
-const { register, login, logout } = require('../controllers')
+const { register, login, logout, verifyEmail } = require('../controllers')
 
 router.route('/register').post(register)
 router.route('/login').post(login)
+router.route('/logout').post(verifyEmail)
 router.route('/logout').get(authenticateUser, logout)
 
 module.exports = router
