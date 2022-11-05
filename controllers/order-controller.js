@@ -34,12 +34,15 @@ const createOrder = async (req, res) => {
 	will add the product to the orderItems array. */
 	for (const item of cartItems) {
 		const dbProduct = await Product.findOne({ _id: item.product })
+
 		if (!dbProduct) {
 			throw new CustomError.NotFoundError(
 				`No product with id : ${item.product}`
 			)
 		}
+
 		const { name, price, image, _id } = dbProduct
+
 		const singleOrderItem = {
 			amount: item.amount,
 			name,
@@ -77,6 +80,7 @@ const createOrder = async (req, res) => {
 
 const getAllOrders = async (req, res) => {
 	const orders = await Order.find({})
+
 	res.status(StatusCodes.OK).json(orders)
 }
 
@@ -84,30 +88,41 @@ const getSingleOrder = async (req, res) => {
 	const { id: singleOrder } = req.params
 
 	const order = await Order.findOne({ _id: singleOrder })
-	
+
 	if (!order.user === req.user.userId) {
 		throw new CustomError.Unauthorized('You have no access')
 	}
 
 	checkPermission(req.user.userId, order.user)
+
 	res.status(StatusCodes.OK).json(order)
 }
+
 const getCurrentUserOrders = async (req, res) => {
 	const orders = await Order.find({ user: req.user.userId })
+
 	res.status(StatusCodes.OK).json(orders)
 }
 
 const updateOrder = async (req, res) => {
 	const { id: orderId } = req.params
+
 	const { paymentIntent } = req.body
+
 	const order = await Order.findOne({ _id: orderId })
+
 	if (!order) {
 		throw new CustomError.NotFoundError('No order found')
 	}
+
 	checkPermission(req.user.userId, order.user)
+
 	order.paymentIntent = paymentIntent
+
 	order.status = 'paid'
+
 	await order.save()
+
 	res.status(StatusCodes.OK).json(order)
 }
 
