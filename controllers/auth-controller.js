@@ -52,7 +52,6 @@ const register = async (req, res) => {
 
 	res.status(StatusCodes.CREATED).json({
 		message: 'Please verify your email to verify account',
-		verificationToken,
 	})
 }
 
