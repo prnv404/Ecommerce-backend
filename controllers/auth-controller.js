@@ -8,10 +8,12 @@ const {
 	createTokenUser,
 	attachCookiesToResponse,
 	sendVerificationEmail,
+	sendResetPassswordEmail,
+	createHash,
 } = require('../utils')
 
 /**
- * It creates a new user and returns a verification token
+ * It creates a new user and sends a verification email to the user
  * @param req - The request object.
  * @param res - The response object.
  */
@@ -55,10 +57,10 @@ const register = async (req, res) => {
 }
 
 /**
- * It takes in an email and password from the request body, checks if the user exists, compares the
- * password, and if everything is correct, it creates a token and attaches it to the response
+ * It logs in a user and returns a token
  * @param req - The request object.
- * @param res - The response object.
+ * @param res - The response object
+ * @returns The user object is being returned.
  */
 
 const login = async (req, res) => {
@@ -155,6 +157,12 @@ const verifyEmail = async (req, res) => {
 	res.status(StatusCodes.OK).json({ msg: 'user verified' })
 }
 
+/**
+ * It deletes the token from the database and clears the cookies
+ * @param req - The request object.
+ * @param res - The response object.
+ */
+
 const logout = async (req, res) => {
 	await Token.findOneAndDelete({ user: req.user.userId })
 
@@ -171,9 +179,87 @@ const logout = async (req, res) => {
 	res.status(StatusCodes.OK).json({ msg: 'user logged out!' })
 }
 
+/**
+ * It takes an email from the request body, finds the user with that email, creates a password token,
+ * sends an email with the password token, saves the password token to the user, and returns a message
+ * to the user
+ * @param req - The request object.
+ * @param res - The response object.
+ */
+
+const forgotPassword = async (req, res) => {
+	const { email } = req.body
+
+	if (!email) {
+		throw new CustomError.BadRequestError('Please provide valid email')
+	}
+
+	const user = await User.findOne({ email })
+
+	if (user) {
+		const passwordToken = crypto.randomBytes(70).toString('hex')
+		// send email
+		const origin = 'http://localhost:3000'
+		await sendResetPassswordEmail({
+			name: user.name,
+			email: user.email,
+			token: passwordToken,
+			origin,
+		})
+
+		const tenMinutes = 1000 * 60 * 10
+
+		const passwordTokenExpirationDate = new Date(Date.now() + tenMinutes)
+
+		user.passwordToken = createHash(passwordToken)
+
+		user.passwordTokenExpirationDate = passwordTokenExpirationDate
+
+		await user.save()
+	}
+
+	res
+		.status(StatusCodes.OK)
+		.json({ msg: 'Please check your email for reset password link' })
+}
+
+/**
+ * It resets the password of a user if the token is valid
+ * @param req - The request object.
+ * @param res - The response object.
+ */
+
+const resetPassword = async (req, res) => {
+	const { token, email, password } = req.body
+
+	if (!token || !email || !password) {
+		throw new CustomError.BadRequestError('Please provide all values')
+	}
+
+	const user = await User.findOne({ email })
+
+	if (user) {
+		const currentDate = new Date()
+
+		if (
+			user.passwordToken === createHash(token) &&
+			user.passwordTokenExpirationDate > currentDate
+		) {
+			user.password = password
+			user.passwordToken = null
+			user.passwordTokenExpirationDate = null
+			await user.save()
+		}
+	}
+
+	res.send('reset password')
+}
+
 module.exports = {
 	verifyEmail,
 	register,
 	login,
 	logout,
+	forgotPassword,
+	resetPassword,
 }
