@@ -1,6 +1,8 @@
 const { StatusCodes } = require('http-status-codes')
 const crypto = require('crypto')
 const User = require('../models/user-model')
+const Token = require('../models/token-model')
+
 const CustomError = require('../errors')
 const {
 	createTokenUser,
@@ -63,45 +65,61 @@ const login = async (req, res) => {
 	const { email, password } = req.body
 
 	if (!email || !password) {
-		throw new CustomError.BadRequestError('please provide email and password')
+		throw new CustomError.BadRequestError('Please provide email and password')
 	}
 
 	const user = await User.findOne({ email })
 
 	if (!user) {
-		throw new CustomError.UnauthenticatedError('Invalid Crendtials')
+		throw new CustomError.UnauthenticatedError('Invalid Credentials')
 	}
 
-	const isMatch = await user.comparePassword(password)
+	const isPasswordCorrect = await user.comparePassword(password)
 
-	if (!user.isVerified === true) {
-		throw new CustomError.UnauthenticatedError('Please verify your account')
+	if (!isPasswordCorrect) {
+		throw new CustomError.UnauthenticatedError('Invalid Credentials')
 	}
 
-	if (!isMatch) {
-		throw new CustomError.UnauthenticatedError('Incorrect Password')
+	if (!user.isVerified) {
+		throw new CustomError.UnauthenticatedError('Please verify your email')
 	}
 
 	const tokenUser = createTokenUser(user)
 
-	attachCookiesToResponse({ res, user: tokenUser })
+	// create refresh token
+	let refreshToken = ''
+	// check for existing token
+	const existingToken = await Token.findOne({ user: user._id })
 
-	res.status(StatusCodes.CREATED).json({ tokenUser })
-}
+	if (existingToken) {
+		const { isValid } = existingToken
 
-/**
- * It sets the cookie to 'logout' and expires it immediately
- * @param req - The request object.
- * @param res - The response object.
- */
+		if (!isValid) {
+			throw new CustomError.UnauthenticatedError('Invalid Credentials')
+		}
 
-const logout = async (req, res) => {
-	res.cookie('token', 'logout', {
-		httpOnly: true,
-		expires: new Date(Date.now()),
-	})
+		refreshToken = existingToken.refreshToken
 
-	res.status(StatusCodes.OK).json({ msg: 'logout succesfully' })
+		attachCookiesToResponse({ res, user: tokenUser, refreshToken })
+
+		res.status(StatusCodes.OK).json({ user: tokenUser })
+
+		return
+	}
+
+	refreshToken = crypto.randomBytes(40).toString('hex')
+
+	const userAgent = req.headers['user-agent']
+
+	const { ip } = req
+
+	const userToken = { refreshToken, ip, userAgent, user: user._id }
+
+	await Token.create(userToken)
+
+	attachCookiesToResponse({ res, user: tokenUser, refreshToken })
+
+	res.status(StatusCodes.OK).json({ user: tokenUser })
 }
 
 /**
@@ -135,6 +153,22 @@ const verifyEmail = async (req, res) => {
 	await user.save()
 
 	res.status(StatusCodes.OK).json({ msg: 'user verified' })
+}
+
+const logout = async (req, res) => {
+	await Token.findOneAndDelete({ user: req.user.userId })
+
+	res.cookie('accessToken', 'logout', {
+		httpOnly: true,
+		expires: new Date(Date.now()),
+	})
+
+	res.cookie('refreshToken', 'logout', {
+		httpOnly: true,
+		expires: new Date(Date.now()),
+	})
+
+	res.status(StatusCodes.OK).json({ msg: 'user logged out!' })
 }
 
 module.exports = {
