@@ -2,7 +2,11 @@ const { StatusCodes } = require('http-status-codes')
 const crypto = require('crypto')
 const User = require('../models/user-model')
 const CustomError = require('../errors')
-const { createTokenUser, attachCookiesToResponse } = require('../utils')
+const {
+	createTokenUser,
+	attachCookiesToResponse,
+	sendVerificationEmail,
+} = require('../utils')
 
 /**
  * It creates a new user and returns a verification token
@@ -31,6 +35,15 @@ const register = async (req, res) => {
 		password,
 		role,
 		verificationToken,
+	})
+
+	const origin = req.get('origin')
+
+	await sendVerificationEmail({
+		name: user.name,
+		email: user.email,
+		verificationToken: user.verificationToken,
+		origin,
 	})
 
 	res.status(StatusCodes.CREATED).json({
