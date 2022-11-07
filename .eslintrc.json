@@ -19,7 +19,7 @@
 		"consistent-return": "off",
 		"func-names": "off",
 		"arrow-body-style": "off",
-        "no-tabs":"off",
-        "no-trailing-spaces":"off"
+		"no-tabs": "off",
+		"no-trailing-spaces": "off"
 	}
 }
