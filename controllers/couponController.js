@@ -31,10 +31,31 @@ const getAllCoupon = async (req, res) => {
 }
 
 const deleteCoupon = async (req, res) => {
-    
+	const coupon = await Coupon.findOne({ code: req.params.code })
+	if (!coupon) {
+		res.status(404).json({
+			message: 'Coupon not found',
+		})
+	} else {
+		await Coupon.deleteOne({ _id: coupon._id })
+		res.status(200).json({
+			message: 'Coupon deleted successfully',
+		})
+	}
 }
 
-const verifyCoupon = async (req, res) => {}
+const verifyCoupon = async (req, res) => {
+	const coupon = await Coupon.findOne({ code: req.params.code })
+	if (!coupon) {
+		res.status(404).json({
+			message: 'Coupon not found',
+		})
+	} else {
+		res.status(200).json({
+			coupon,
+		})
+	}
+}
 
 module.exports = {
 	addCoupon,
