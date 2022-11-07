@@ -13,7 +13,17 @@ const {
 	createOrder,
 	updateOrder,
 } = require('./order-controller')
-
+const {
+	createCategory,
+	getAllCategory,
+	updateCategory,
+} = require('./category-controller')
+const {
+	addCoupon,
+	getAllCoupon,
+	deleteCoupon,
+	verifyCoupon,
+} = require('./couponController')
 const {
 	createProduct,
 	getAllProducts,
@@ -41,6 +51,13 @@ const {
 } = require('./user-controller')
 
 module.exports = {
+	addCoupon,
+	getAllCoupon,
+	deleteCoupon,
+	verifyCoupon,
+	createCategory,
+	getAllCategory,
+	updateCategory,
 	forgotPassword,
 	resetPassword,
 	getSingleOrder,
