@@ -29,6 +29,7 @@ const orderRouter = require('./routes/order-route')
 const categoryRouter = require('./routes/category-router')
 const couponRouter = require('./routes/coupon-route')
 
+const verifyPayment = require('./controllers')
 // MIDDLEWARES
 
 app.set('trust proxy', 1)
@@ -64,6 +65,8 @@ app.use('/api/v1/reviews', reviewRouter)
 app.use('/api/v1/orders', orderRouter)
 app.use('/api/v1/category', categoryRouter)
 app.use('api/v1/coupon', categoryRouter)
+
+app.post('/api/v1/verify-payment', verifyPayment)
 
 app.use(notFoundMiddleware)
 app.use(errorHandlerMiddleware)

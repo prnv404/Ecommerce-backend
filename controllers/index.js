@@ -50,7 +50,10 @@ const {
 	updateUserPassword,
 } = require('./user-controller')
 
+const verifyPayment = require('./payment-controller')
+
 module.exports = {
+	verifyPayment,
 	addCoupon,
 	getAllCoupon,
 	deleteCoupon,
