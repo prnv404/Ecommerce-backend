@@ -5,8 +5,11 @@ const sendEmail = require('./sendEmail')
 const sendVerificationEmail = require('./sendVerficationEmail')
 const sendResetPassswordEmail = require('./sendResetPasswordEmail')
 const createHash = require('./createHash')
+const { createOTP, verifyOTP } = require('./OTP')
 
 module.exports = {
+	createOTP,
+	verifyOTP,
 	createJWT,
 	isTokenValid,
 	attachCookiesToResponse,

@@ -5,6 +5,7 @@ const {
 	verifyEmail,
 	forgotPassword,
 	resetPassword,
+	verifyNumber,
 } = require('./auth-controller')
 const {
 	getAllOrders,
@@ -53,6 +54,7 @@ const {
 const verifyPayment = require('./payment-controller')
 
 module.exports = {
+	verifyNumber,
 	verifyPayment,
 	addCoupon,
 	getAllCoupon,

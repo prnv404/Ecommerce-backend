@@ -11,6 +11,8 @@ const {
 	sendVerificationEmail,
 	sendResetPassswordEmail,
 	createHash,
+	verifyOTP,
+	createOTP,
 } = require('../utils')
 
 /**
@@ -20,12 +22,22 @@ const {
  */
 
 const register = async (req, res) => {
-	const { email, name, password } = req.body
+	const { email, name, password, mobNumber } = req.body
 
-	const emailExist = await User.findOne({ email })
+	if (email) {
+		const emailExist = await User.findOne({ email })
 
-	if (emailExist) {
-		throw new CustomError.BadRequestError('Email already exist')
+		if (emailExist) {
+			throw new CustomError.BadRequestError('Email already exist')
+		}
+	}
+
+	if (mobNumber) {
+		const numberExist = await User.findOne({ mobNumber })
+
+		if (numberExist) {
+			throw new CustomError.BadRequestError('Mobile Number already exist')
+		}
 	}
 
 	const isFirstAccount = (await User.countDocuments({})) === 0
@@ -40,16 +52,26 @@ const register = async (req, res) => {
 		password,
 		role,
 		verificationToken,
+		mobNumber,
 	})
 
 	const origin = req.get('origin')
+	if (email) {
+		await sendVerificationEmail({
+			name: user.name,
+			email: user.email,
+			verificationToken: user.verificationToken,
+			origin,
+		})
+	}
 
-	await sendVerificationEmail({
-		name: user.name,
-		email: user.email,
-		verificationToken: user.verificationToken,
-		origin,
-	})
+	if (mobNumber) {
+		await createOTP({ phoneNumber: mobNumber, channel: 'sms' })
+		res.status(StatusCodes.CREATED).json({
+			message: 'Please verify your Mobile Number to verify account',
+		})
+		return
+	}
 
 	res.status(StatusCodes.CREATED).json({
 		message: 'Please verify your email to verify account',
@@ -64,13 +86,27 @@ const register = async (req, res) => {
  */
 
 const login = async (req, res) => {
-	const { email, password } = req.body
+	const { mobNumber, email, password } = req.body
 
-	if (!email || !password) {
-		throw new CustomError.BadRequestError('Please provide email and password')
+	if (!password) {
+		throw new CustomError.BadRequestError('Please provide password')
 	}
 
-	const user = await User.findOne({ email })
+	if (!mobNumber && !email) {
+		throw new CustomError.BadRequestError(
+			'Please provide email or mobile number'
+		)
+	}
+
+	let user
+
+	if (email) {
+		user = await User.findOne({ email })
+	}
+
+	if (mobNumber) {
+		user = await User.findOne({ mobNumber })
+	}
 
 	if (!user) {
 		throw new CustomError.UnauthenticatedError('Invalid Credentials')
@@ -163,6 +199,36 @@ const verifyEmail = async (req, res) => {
  * @param req - The request object.
  * @param res - The response object.
  */
+const verifyNumber = async (req, res) => {
+	const { mobNumber, OTP } = req.body
+
+	if (!mobNumber || !OTP) {
+		throw new CustomError.BadRequestError('Please provide all values')
+	}
+
+	const user = await User.findOne({ mobNumber })
+
+	if (!user) {
+		throw new CustomError.NotFound('No user found')
+	}
+
+	const verify = await verifyOTP({ phoneNumber: mobNumber, code: OTP })
+
+	const { valid } = verify
+
+	if (!valid === true) {
+		throw new CustomError.BadRequestError('Incorrect OTP')
+	}
+	user.isVerified = true
+
+	user.verified = Date.now()
+
+	user.verificationToken = ''
+
+	await user.save()
+
+	res.status(StatusCodes.OK).json({ message: 'Please Login' })
+}
 
 const logout = async (req, res) => {
 	await Token.findOneAndDelete({ user: req.user.userId })
@@ -263,4 +329,5 @@ module.exports = {
 	logout,
 	forgotPassword,
 	resetPassword,
+	verifyNumber,
 }
