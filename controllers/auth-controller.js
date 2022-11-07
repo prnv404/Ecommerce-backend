@@ -4,6 +4,7 @@ const User = require('../models/user-model')
 const Token = require('../models/token-model')
 
 const CustomError = require('../errors')
+
 const {
 	createTokenUser,
 	attachCookiesToResponse,
@@ -137,6 +138,7 @@ const verifyEmail = async (req, res) => {
 	}
 
 	const user = await User.findOne({ email })
+
 	if (!user) {
 		throw new CustomError.NotFoundError('NO user found')
 	}

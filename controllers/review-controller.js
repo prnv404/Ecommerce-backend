@@ -4,6 +4,12 @@ const Product = require('../models/product-model')
 const CustomError = require('../errors')
 const { checkPermission } = require('../utils')
 
+/**
+ * It creates a review for a product
+ * @param req - The request object. This contains information about the HTTP request that raised the
+ * event.
+ * @param res - The response object.
+ */
 const createReview = async (req, res) => {
 	const { product: productId } = req.body
 	req.body.user = req.user.userId
@@ -17,6 +23,12 @@ const createReview = async (req, res) => {
 	res.status(StatusCodes.CREATED).json(review)
 }
 
+/**
+ * It gets all the reviews from the database and populates the product field with the product's name,
+ * price, and company
+ * @param req - The request object.
+ * @param res - The response object.
+ */
 const getAllReviews = async (req, res) => {
 	const reviews = await Review.find({}).populate({
 		path: 'product',
@@ -24,6 +36,11 @@ const getAllReviews = async (req, res) => {
 	})
 	res.status(StatusCodes.OK).json(reviews)
 }
+/**
+ * It gets a single review by its id
+ * @param req - The request object.
+ * @param res - The response object.
+ */
 
 const getSingleReview = async (req, res) => {
 	const reviewId = req.params.id
@@ -34,6 +51,11 @@ const getSingleReview = async (req, res) => {
 	res.status(StatusCodes.OK).json(review)
 }
 
+/**
+ * It updates a review with the given id
+ * @param req - The request object.
+ * @param res - The response object.
+ */
 const updateReview = async (req, res) => {
 	const { id: reviewId } = req.params
 	const { title, comment, rating } = req.body
@@ -49,6 +71,12 @@ const updateReview = async (req, res) => {
 
 	res.status(StatusCodes.CREATED).json(review)
 }
+/**
+ * It deletes a review if the user is the owner of the review
+ * @param req - The request object. This contains information about the HTTP request that raised the
+ * event.
+ * @param res - The response object.
+ */
 const deleteReview = async (req, res) => {
 	const { id: reviewId } = req.params
 	const review = await Review.findOne({ _id: reviewId })
@@ -60,6 +88,12 @@ const deleteReview = async (req, res) => {
 	await review.remove()
 	res.status(StatusCodes.OK).json({ msg: 'success' })
 }
+/**
+ * It finds a review by the product id and returns it
+ * @param req - The request object. This contains information about the HTTP request that raised the
+ * event.
+ * @param res - The response object.
+ */
 
 const getSingleProductReview = async (req, res) => {
 	const { id: productId } = req.params
