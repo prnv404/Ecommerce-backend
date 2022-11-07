@@ -1,15 +1,16 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 const { StatusCodes } = require('http-status-codes')
+const Razorpay = require('razorpay')
 const Order = require('../models/order-model')
 const Product = require('../models/product-model')
 const CustomError = require('../errors')
 const { checkPermission } = require('../utils')
 
-const fakeStripeAPI = async ({ amount, currency }) => {
-	const client_secret = 'someFakeValue'
-	return { client_secret, amount }
-}
+const instance = new Razorpay({
+	key_id: process.env.KEY_ID,
+	key_secret: process.env.KEY_SECRET,
+})
 
 /**
  * It creates an order
@@ -58,24 +59,30 @@ const createOrder = async (req, res) => {
 
 	const total = tax + shippingFee + subtotal
 
-	const paymentIntent = await fakeStripeAPI({
-		amount: total,
-		currency: 'usd',
-	})
-
 	const order = await Order.create({
 		cartItem: orderItems,
 		total,
 		subtotal,
 		tax,
 		shippingFee,
-		clientSecret: paymentIntent.client_secret,
 		user: req.user.userId,
 	})
 
-	res
-		.status(StatusCodes.CREATED)
-		.json({ order, clientSecret: order.clientSecret })
+	try {
+		const result = await instance.orders.create({
+			amount: total * 100,
+			currency: 'INR',
+			receipt: req.user.userId,
+		})
+
+		res.status(StatusCodes.CREATED).json({
+			success: true,
+			result,
+			total,
+		})
+	} catch (error) {
+		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: 'Order failed' })
+	}
 }
 
 const getAllOrders = async (req, res) => {
