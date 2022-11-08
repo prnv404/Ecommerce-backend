@@ -20,6 +20,7 @@
 		"express-fileupload": "^1.2.1",
 		"express-mongo-sanitize": "^2.2.0",
 		"express-rate-limit": "^5.5.1",
+		"google-auth-library": "^8.6.0",
 		"helmet": "^4.6.0",
 		"http-status-codes": "^2.1.4",
 		"joi": "^17.4.0",
