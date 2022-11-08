@@ -1,8 +1,8 @@
 const { StatusCodes } = require('http-status-codes')
 const path = require('path')
+const cloudinary = require('cloudinary')
 const Product = require('../models/product-model')
 const CustomError = require('../errors')
-const upload = require('./cloudinary')
 
 /**
  * It creates a new product and returns it
@@ -73,30 +73,48 @@ const deleteProduct = async (req, res) => {
 }
 
 /**
- * It uploads an image to Cloudinary and returns the public_id and url of the uploaded image
+ * It uploads an image to cloudinary and returns the public_id and url of the uploaded image
  * @param req - The request object.
  * @param res - The response object.
  */
+
 const uploadImage = async (req, res) => {
+	cloudinary.config({
+		cloud_name: process.env.CLOUDINARY_NAME,
+		api_key: process.env.CLOUDINARY_API_KEY,
+		api_secret: process.env.CLOUDINARY_SECRET,
+	})
+
 	if (!req.files) {
 		throw new CustomError.BadRequestError('Please provide image')
 	}
 
 	const productImage = req.files.image
+
 	if (!productImage.mimetype.startsWith('image')) {
 		throw new CustomError.BadRequestError('Please provide image')
 	}
+
 	const maxSize = 1024 * 1024
+
 	if (productImage.size > maxSize) {
 		throw new CustomError.BadRequestError('Please provide image less than 1 mb')
 	}
+
 	const imagePath = path.join(
 		__dirname,
 		// eslint-disable-next-line no-useless-concat
 		'../public/uploads/' + `${productImage.name}`
 	)
+
 	await productImage.mv(imagePath)
-	const result = await upload(imagePath)
+
+	let result = await cloudinary.uploader.upload(imagePath, {
+		public_id: `${Date.now()}`,
+		resource_type: 'auto', // jpeg, png
+	})
+
+	console.log(result)
 
 	res
 		.status(StatusCodes.OK)
