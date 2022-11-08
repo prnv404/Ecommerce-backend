@@ -20,7 +20,3 @@ const upload = async (imagepath) => {
 }
 
 module.exports = upload
-// res.json({
-//     public_id: result.public_id,
-//     url: result.secure_url,
-// })
