@@ -26,12 +26,10 @@ const ProductSchema = mongoose.Schema(
 		category: {
 			type: String,
 			required: [true, 'Please provide category'],
-			enum: ['office', 'kitchen', 'bedroom'],
 		},
 		company: {
 			type: String,
 			required: [true, 'Please provide company'],
-			enum: ['marcos', 'ikea', 'liddy'],
 		},
 		color: {
 			type: [String],
