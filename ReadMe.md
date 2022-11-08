@@ -1,9 +1,7 @@
 
 # Ecommerce Backend
 
-This is an ecommerce backend build with nodejs express and mongodb for database . Admin can create product and user can purchase it using online payment methods 
- like UPI , Netbanking , Credit/Debit card etc..
-## Tech Stack
+This is an ecommerce backend build with nodejs express and mongodb with all crud functionality
 
 
 **Server:** Node, Express , Mongodb 
@@ -177,13 +175,6 @@ Google Oauth
 Contributions are always welcome!
 
 
-
-
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
-
-
 ## Future Updations
 
 - Cart service
@@ -197,3 +188,6 @@ Contributions are always welcome!
 
 If you have any feedback, please reach out to me at pranavofficial404@gmail.com
 
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
