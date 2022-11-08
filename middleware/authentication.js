@@ -9,7 +9,7 @@ const authenticateUser = async (req, res, next) => {
 	try {
 		if (accessToken) {
 			const payload = isTokenValid({ token: accessToken })
-			console.log('ok')
+			// console.log('ok')
 			req.user = payload.user
 			return next()
 		}
@@ -20,7 +20,7 @@ const authenticateUser = async (req, res, next) => {
 			refreshToken: payload.refreshToken,
 		})
 
-		if (!existingToken || !existingToken.isValid) {
+		if (!existingToken || !existingToken?.isValid) {
 			console.log('ok')
 			throw new CustomError.UnauthenticatedError('Authentication Invalid')
 		}

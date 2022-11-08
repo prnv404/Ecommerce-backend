@@ -1,5 +1,6 @@
 const { StatusCodes } = require('http-status-codes')
 const crypto = require('crypto')
+const { OAuth2Client } = require('google-auth-library')
 const User = require('../models/user-model')
 const Token = require('../models/token-model')
 
@@ -320,6 +321,70 @@ const resetPassword = async (req, res) => {
 	}
 
 	res.send('reset password')
+}
+
+/**
+ * It takes in a request object, verifies the user's Google token, and returns a response object with a
+ * user object and a refresh token
+ * @param req - The request object
+ * @param res - The response object
+ */
+
+const googleSignUser = async (req, res) => {
+	try {
+		const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
+		const ticket = await client.verifyIdToken({
+			idToken: req.body?.credential,
+			audience: process.env.GOOGLE_CLIENT_ID,
+		})
+		const payload = ticket.getPayload()
+
+		const { email, name } = payload
+
+		const user = await User.findOne({ email })
+
+		const tokenUser = createTokenUser(user)
+
+		let refreshToken = ''
+
+		if (user) {
+			const existingToken = await Token.findOne({ user: user._id })
+
+			if (existingToken) {
+				const { isValid } = existingToken
+
+				if (!isValid) {
+					throw new CustomError.UnauthenticatedError('Invalid Credentials')
+				}
+
+				refreshToken = existingToken.refreshToken
+
+				attachCookiesToResponse({ res, user: tokenUser, refreshToken })
+
+				res.status(StatusCodes.OK).json({ user: tokenUser })
+
+				return
+			}
+		} else {
+			refreshToken = crypto.randomBytes(40).toString('hex')
+
+			const userAgent = req.headers['user-agent']
+
+			const { ip } = req
+
+			const userToken = { refreshToken, ip, userAgent, user: user._id }
+
+			await Token.create(userToken)
+
+			attachCookiesToResponse({ res, user: tokenUser, refreshToken })
+
+			res.status(StatusCodes.OK).json({ user: tokenUser })
+		}
+	} catch (error) {
+		res.status(400)
+
+		throw new CustomError.UnauthenticatedError('Google Authentication failed')
+	}
 }
 
 module.exports = {
