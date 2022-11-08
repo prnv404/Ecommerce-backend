@@ -1,8 +1,8 @@
 
 # Ecommerce Backend
 
-This is an ecommerce backend build with nodejs express and mongodb for database . Admin can create product and user can purchase it using online payment methods 
- like UPI , Netbanking , Credit/Debit card etc..
+This is an ecommerce backend build with nodejs express and mongodb for database . Admin can create product and user can review and purchase it using online payment methods 
+
 ## Tech Stack
 
 
