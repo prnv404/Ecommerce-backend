@@ -19,7 +19,7 @@ const { getSingleProductReview } = require('../controllers')
 
 router
 	.route('/')
-	.get(getAllProducts)
+	.get(authenticateUser, getAllProducts)
 	.post(authenticateUser, authorizePermission('admin'), createProduct)
 
 router
