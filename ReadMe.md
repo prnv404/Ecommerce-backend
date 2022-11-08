@@ -177,13 +177,6 @@ Google Oauth
 Contributions are always welcome!
 
 
-
-
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
-
-
 ## Future Updations
 
 - Cart service
@@ -197,3 +190,6 @@ Contributions are always welcome!
 
 If you have any feedback, please reach out to me at pranavofficial404@gmail.com
 
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
