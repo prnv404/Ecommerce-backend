@@ -1,5 +1,6 @@
 const { StatusCodes } = require('http-status-codes')
 const path = require('path')
+const cloudinary = require('cloudinary')
 const Product = require('../models/product-model')
 const CustomError = require('../errors')
 const upload = require('./cloudinary')
@@ -78,6 +79,11 @@ const deleteProduct = async (req, res) => {
  * @param res - The response object.
  */
 const uploadImage = async (req, res) => {
+	cloudinary.config({
+		cloud_name: process.env.CLOUDINARY_NAME,
+		api_key: process.env.CLOUDINARY_API_KEY,
+		api_secret: process.env.CLOUDINARY_SECRET,
+	})
 	if (!req.files) {
 		throw new CustomError.BadRequestError('Please provide image')
 	}
@@ -96,7 +102,12 @@ const uploadImage = async (req, res) => {
 		'../public/uploads/' + `${productImage.name}`
 	)
 	await productImage.mv(imagePath)
-	const result = await upload(imagePath)
+	let result = await cloudinary.uploader.upload(imagePath, {
+		public_id: `${Date.now()}`,
+		resource_type: 'auto', // jpeg, png
+	})
+
+	console.log(result)
 
 	res
 		.status(StatusCodes.OK)
