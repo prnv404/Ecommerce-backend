@@ -57,6 +57,7 @@ const register = async (req, res) => {
 	})
 
 	const origin = req.get('origin')
+
 	if (email) {
 		await sendVerificationEmail({
 			name: user.name,
@@ -220,6 +221,7 @@ const verifyNumber = async (req, res) => {
 	if (!valid === true) {
 		throw new CustomError.BadRequestError('Incorrect OTP')
 	}
+
 	user.isVerified = true
 
 	user.verified = Date.now()
@@ -337,6 +339,7 @@ const googleSignUser = async (req, res) => {
 			idToken: req.body?.credential,
 			audience: process.env.GOOGLE_CLIENT_ID,
 		})
+
 		const payload = ticket.getPayload()
 
 		const { email, name } = payload
@@ -395,4 +398,5 @@ module.exports = {
 	forgotPassword,
 	resetPassword,
 	verifyNumber,
+	googleSignUser,
 }
