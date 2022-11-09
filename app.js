@@ -57,7 +57,7 @@ app.get('/api/v1', (req, res) => {
 	console.log(req.signedCookies)
 	res.send('Ecommerce-api')
 })
-
+// console.log(authRouter)
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/users', userRouter)
 app.use('/api/v1/products', productRouter)
