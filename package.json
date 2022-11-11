@@ -5,16 +5,8 @@
 	"main": "app.js",
 	"scripts": {
 		"start": "node app.js",
-<<<<<<< HEAD
 		"dev": "nodemon app.js",
-<<<<<<< HEAD
 		"test": "jest"
-=======
-		"dev": "nodemon app.js"
->>>>>>> parent of 5fb38cf... jest added
-=======
-		"test":"jest"
->>>>>>> parent of 08e907d... mod
 	},
 	"author": "pranav",
 	"license": "ISC",
