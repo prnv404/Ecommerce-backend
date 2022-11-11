@@ -108,10 +108,11 @@ const login = async (req, res) => {
 
 	if (mobNumber) {
 		user = await User.findOne({ mobNumber })
+		console.log(user)
 	}
 
 	if (!user) {
-		throw new CustomError.UnauthenticatedError('Invalid Credentials')
+		throw new CustomError.UnauthenticatedError('Invalid Credentials no user')
 	}
 
 	const isPasswordCorrect = await user.comparePassword(password)
