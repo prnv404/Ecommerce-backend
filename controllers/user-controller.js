@@ -13,7 +13,7 @@ const {
  * @param res - The response object.
  */
 const getAllUser = async (req, res) => {
-	// console.log(req.user)
+	console.log(req.user)
 	const users = await User.find({ role: 'user' }).select('-password')
 	res.status(StatusCodes.OK).json({ users })
 }
