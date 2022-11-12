@@ -158,7 +158,7 @@ Google Oauth
 - [morgan](https://www.npmjs.com/package/morgan) - HTTP request logger middleware for node.js
 - [nodemailer](https://nodemailer.com/about/) -Nodemailer is a module for Node.js applications to allow easy as cake email sending.  
 - [razorpay](https://razorpay.com/) - Razorpay is the only payments solution in India that allows businesses to accept, process and disburse payments with its product suite
-- [twilio](https://www.twilio.com/) - Twilio Used for verify Mobile Number throght OTP verification
+- [twilio](https://www.twilio.com/) - Twilio Used for verify Mobile Number through OTP verification
 - [validator](https://www.npmjs.com/package/validator) - This library validates and sanitizes strings only.
 - [xss-clean](https://www.npmjs.com/package/xss-clean) - Node.js Connect middleware to sanitize user input coming from POST body, GET queries, and url params.
 - [eslint](https://eslint.org/) - ESLint statically analyzes your code to quickly find problems. It is built into most text editors and you can run ESLint as part of your continuous integration pipeline.
