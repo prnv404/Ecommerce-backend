@@ -32,4 +32,11 @@ Start the server in development mode
 ```bash
   npm run dev
 ```
+# My Project
+## Installation
+<details>
+  <summary>Click to expand</summary>
+  
+  Here is some hidden content.
+</details>
 
